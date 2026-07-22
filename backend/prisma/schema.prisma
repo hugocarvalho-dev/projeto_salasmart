@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String
+  category  String
+  unit      String
+  active    Boolean  @default(true)
+
+  items     PurchaseItem[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model Purchase {
+  id             String         @id @default(cuid())
+  customerName   String         @map("customer_name")
+
+  room           String         @default("") @map("room")
+
+  date           DateTime
+
+  items          PurchaseItem[]
+
+  deletedAt      DateTime?      @map("deleted_at")
+  deletedBy      String?        @map("deleted_by")
+  deletionReason String?        @map("deletion_reason")
+
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@index([date])
+  @@map("purchases")
+}
+
+model TeamMember {
+  id         Int      @id @default(autoincrement())
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  email      String   @unique
+  administrador Boolean @default(true)
+
+  protected  Boolean  @default(false)
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("team_members")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  label     String   @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model PurchaseItem {
+  id         Int      @id @default(autoincrement())
+  purchaseId String   @map("purchase_id")
+  purchase   Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+
+  productId  Int?     @map("product_id")
+  product    Product? @relation(fields: [productId], references: [id])
+
+  name       String
+  qty        Int
+
+  @@index([purchaseId])
+  @@map("purchase_items")
+}

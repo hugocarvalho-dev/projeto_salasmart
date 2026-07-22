@@ -1,0 +1,9 @@
+node_modules/
+dist/
+# Ignora todos os arquivos de ambiente (contêm segredos), exceto o template.
+.env
+.env.*
+!.env.example
+!.env.production.example
+*.log
+public/
